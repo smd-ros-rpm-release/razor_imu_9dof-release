@@ -1,3 +1,24 @@
+## razor_imu_9dof (hydro) - 1.0.3-2
+
+The packages in the `razor_imu_9dof` repository were released into the `hydro` distro by running `/usr/bin/bloom-release --rosdistro hydro --track hydro razor_imu_9dof --edit` on `Mon, 03 Nov 2014 07:49:49 -0000`
+
+The `razor_imu_9dof` package was released.
+
+Version of package(s) in repository `razor_imu_9dof`:
+- upstream repository: https://github.com/KristofRobot/razor_imu_9dof.git
+- release repository: unknown
+- rosdistro version: `null`
+- old version: `1.0.3-1`
+- new version: `1.0.3-2`
+
+Versions of tools used:
+- bloom version: `0.5.12`
+- catkin_pkg version: `0.2.6`
+- rosdep version: `0.10.32`
+- rosdistro version: `0.3.6`
+- vcstools version: `0.1.35`
+
+
 ## https://github.com/KristofRobot/razor_imu_9dof-release (hydro) - 1.0.3-1
 
 The packages in the `https://github.com/KristofRobot/razor_imu_9dof-release` repository were released into the `hydro` distro by running `/usr/bin/bloom-release --rosdistro hydro --track hydro https://github.com/KristofRobot/razor_imu_9dof-release --edit` on `Mon, 03 Nov 2014 07:39:55 -0000`
