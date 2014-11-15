@@ -31,15 +31,17 @@ import rospy
 import serial
 import string
 import math
+import sys
 
-from time import time
+#from time import time
 from sensor_msgs.msg import Imu
 from tf.transformations import quaternion_from_euler
 
 degrees2rad = math.pi/180.0
 
 rospy.init_node("razor_node")
-pub = rospy.Publisher('imu', Imu)
+#We only care about the most recent measurement, i.e. queue_size=1
+pub = rospy.Publisher('imu', Imu, queue_size=1)
 
 imuMsg = Imu()
 
@@ -79,11 +81,17 @@ imuMsg.linear_acceleration_covariance = [
 0 , 0 , 0.04
 ]
 
-default_port='/dev/ttyUSB1'
+default_port='/dev/ttyUSB0'
 port = rospy.get_param('~device', default_port)
 # Check your COM port and baud rate
 rospy.loginfo("Opening %s...", port)
-ser = serial.Serial(port=port,baudrate=57600, timeout=1)
+
+try:
+    ser = serial.Serial(port=port, baudrate=57600, timeout=1)
+except serial.serialutil.SerialException:
+    rospy.logerr("IMU not found at port "+port + ". Did you specify the correct port in the launch file?")
+    #exit
+    sys.exit(0)
 
 #f = open("Serial"+str(time())+".txt", 'w')
 
@@ -108,19 +116,23 @@ while not rospy.is_shutdown():
     words = string.split(line,",")    # Fields split
     if len(words) > 2:
         try:
-            #for IMU firmware z is down, for ROS z should be up (see REP 103)
+            #in AHRS firmware z axis points down, in ROS z axis points up (see REP 103)
             yaw = -float(words[0])*degrees2rad
-            #for IMU firmware y is right, for ROS y should be left (see REP 103)
+            #in AHRS firmware y axis points right, in ROS y axis points left (see REP 103)
             pitch = -float(words[1])*degrees2rad
             roll = float(words[2])*degrees2rad
             
             # Publish message
-            imuMsg.linear_acceleration.x = float(words[3]) * accel_factor
+            # AHRS firmware accelerations are negated
+            # This means y and z are correct for ROS, but x needs reversing
+            imuMsg.linear_acceleration.x = -float(words[3]) * accel_factor
             imuMsg.linear_acceleration.y = float(words[4]) * accel_factor
             imuMsg.linear_acceleration.z = float(words[5]) * accel_factor
-            
+
             imuMsg.angular_velocity.x = float(words[6])
+            #in AHRS firmware y axis points right, in ROS y axis points left (see REP 103)
             imuMsg.angular_velocity.y = -float(words[7])
+            #in AHRS firmware z axis points down, in ROS z axis points up (see REP 103) 
             imuMsg.angular_velocity.z = -float(words[8])
         except Exception as e:
             print e
